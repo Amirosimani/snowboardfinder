@@ -1,3 +1,13 @@
+import requests
+import pandas as pd
+import time
+from tqdm import tqdm
+import re
+
+from bs4 import BeautifulSoup
+from bs4.dammit import EncodingDetector
+
+
 # This is a sample Python script.
 
 # Press ⌃R to execute it or replace it with your code.
