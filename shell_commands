@@ -6,10 +6,9 @@ aws ecr create-repository --repository-name snowboard --image-scanning-configura
 
 
 #Tag the image to match  repository name, and deploy the image to Amazon ECR
-docker tag sb-web-scraper:latest 367158743199.dkr.ecr.us-east-1.amazonaws.com/snowboard:latest
-docker push 367158743199.dkr.ecr.us-east-1.amazonaws.com/snowboard:latest
+docker tag lambda/image-scraper 367158743199.dkr.ecr.us-east-1.amazonaws.com/snowboard-web-scraper:latest
+docker push 367158743199.dkr.ecr.us-east-1.amazonaws.com/snowboard-web-scraper:latest
 
 
 
-curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"query":"labrador", "count":3
-, "bucket":"snowboard-finder", "folder_path":"local/"}'
+# curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"query":"labrador", "count":3, "bucket":"snowboard-finder", "folder_path":"local/"}'
