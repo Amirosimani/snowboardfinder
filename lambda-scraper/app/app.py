@@ -10,4 +10,4 @@ def handler(event, context):
         key = event['folder_path'] + event['gender'] + '.json'
         s3s.upload_object(board_ratings, event['bucket'], key)
     scr.close_connection()
-    return f"Successfully scraped {event['gender']} and loaded snowboard ratings to {event['bucket']}{event['folder_path']}"
+    # return f"Successfully scraped {event['gender']} and loaded snowboard ratings to {event['bucket']}{event['folder_path']}"
