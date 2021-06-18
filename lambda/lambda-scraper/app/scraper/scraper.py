@@ -43,7 +43,7 @@ class GearScraper:
     @staticmethod
     def __hashme(x):
         unique_id = base64.b64encode(hashlib.sha1(x.encode('UTF-8')).digest())
-        return str(unique_id)
+        return unique_id.decode('utf-8')
 
     def __get_boards_url(self, gender, browser):
         search_url = f"https://thegoodride.com/snowboard-reviews/?{gender}=1"
