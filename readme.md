@@ -29,7 +29,7 @@ The -v flag mounts your local AWS credentials into the docker container allowing
 
 To confirm the container is working as it should locally, you can run a similar command to
 
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"bucket":"snowboard-finder", "folder_path":"raw/"}'
+	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"bucket":"snowboard-finder", "folder_path":"raw/", "gender":"mens"}'
 
 
 This command intends to query the website, scrape the ratings for both mens and womens boards and then persist them to a bucket called 'snowboard-finder' within a 'folder' called 'raw'.
@@ -54,6 +54,15 @@ docker push <ACCOUNT ID>.dkr.ecr.us-east-1.amazonaws.com/snowboard-web-scraper:l
 
 ```
 
+testing on AWS
+```json
+{
+  "gender": "mens",
+  "bucket": "snowboard-finder",
+  "folder_path": "raw/"
+}
+
+```
 
 -----
 
