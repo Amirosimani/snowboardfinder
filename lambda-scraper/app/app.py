@@ -11,4 +11,4 @@ def handler(event, context):
         key = event['folder_path'] + gender + '.json'
         s3s.upload_object(board_ratings, event['bucket'], key)
     scr.close_connection()
-    # return "Successfully loaded"
+    return f"Successfully scraped and loaded snowboard ratings to {event['bucket']}{event['folder_path']}"

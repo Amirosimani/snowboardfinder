@@ -4,7 +4,8 @@
 
 folder structure
 
-## Lambda functions
+----
+## Lambda Functions
 
 ### Web Scraper
 This project containerises a web scraper that can query the good ride website and then scrape and save all the snowboard reviews and ratings.
@@ -17,7 +18,7 @@ The Dockerfile contains the instructions to build this image. You can run the co
 
 	docker build -t lambda/web-scraper:latest .
 
-#### running the container locally
+#### Running the container locally
 
 The image can be run locally before you deploy to deploy to AWS Lambda. Providing you already have AWS credentials setup in `~/.aws/credentials` you can simply run the command.
 
@@ -28,15 +29,30 @@ The -v flag mounts your local AWS credentials into the docker container allowing
 
 To confirm the container is working as it should locally, you can run a similar command to
 
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"query":"labrador", "count":3
-	, "bucket":"my-dogs", "folder_path":"local/"}'
+	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"bucket":"snowboard-finder", "folder_path":"raw/"}'
 
 
-This command intends to query google images for 'labrador', scrape the first 3 images returned and then persist them to a bucket called 'my-dogs' within a 'folder' called 'local'. A successful result should return something like this...
+This command intends to query the website, scrape the ratings for both mens and womens boards and then persist them to a bucket called 'snowboard-finder' within a 'folder' called 'raw'.
 
-"Successfully loaded 3 images to bucket my-dogs. Folder path local/ and file names ['4ddebbca9a.jpeg', 'eafde83cd9.jpeg
-', 'b61b601eea.jpeg']."
-The image names are based on a hash of their data so the names are likely to differ. You can also verify the result by checking your S3 bucket on AWS.
+#### Deploying to Lambda
+
+AWS Lambda can now take an image to run as a serverless function. At the time of writing this feature is limited to certain regions so you will need to carefully select the region. For extra help, AWS have published a guide to working with containers in Lambda https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html.
+
+You will also need to create an Elastic Container Registry within AWS - a place to store your Docker images so they can be used by Lambda. For extra help, AWS have published a guide to working with ECR https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html.
+
+```bash
+# Authenticate the Docker CLI to your Amazon ECR registry.
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ACCOUNT ID>.dkr.ecr.us-east-1.amazonaws.com
+
+# Create a repository in Amazon ECR 
+aws ecr create-repository --repository-name snowboard --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
+
+
+#Tag the image to match  repository name, and deploy the image to Amazon ECR
+docker tag lambda/image-scraper <ACCOUNT ID>.dkr.ecr.us-east-1.amazonaws.com/snowboard-web-scraper:latest
+docker push <ACCOUNT ID>.dkr.ecr.us-east-1.amazonaws.com/snowboard-web-scraper:latest
+
+```
 
 
 -----
