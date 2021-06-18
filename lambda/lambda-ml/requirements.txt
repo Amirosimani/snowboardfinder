@@ -1,4 +1,5 @@
-selenium==3.14.0
-tqdm==4.61.1
+#tqdm==4.61.1
+#scipy
+#pandas
 boto3
 botocore

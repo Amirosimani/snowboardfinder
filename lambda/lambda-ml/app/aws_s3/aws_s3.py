@@ -1,9 +1,21 @@
+import json
 import logging
 import boto3
 from botocore.exceptions import ClientError
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(process)d --- %(name)s %(funcName)20s() : %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
+
+
+def download_object(bucket: str, key: str):
+    s3_client = boto3.client('s3')
+    try:
+        s3_response_object = s3_client.get_object(Bucket=bucket, Key=key)
+        object_content = s3_response_object['Body'].read().decode('utf-8')
+        json_content = json.loads(object_content)
+        return json_content
+    except ClientError as e:
+        logging.error(e)
 
 
 def upload_object(object: bytes, bucket: str, key: str) -> bool:

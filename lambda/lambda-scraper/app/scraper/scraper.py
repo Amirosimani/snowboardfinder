@@ -6,6 +6,11 @@ import logging
 from tqdm import tqdm
 from selenium import webdriver
 
+# For local testing + line 22
+# from webdriver_manager.chrome import ChromeDriverManager
+# driver = webdriver.Chrome(ChromeDriverManager().install())
+
+
 logging.basicConfig(format='%(asctime)s %(levelname)s %(process)d --- %(name)s %(funcName)20s() : %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
 
@@ -22,10 +27,10 @@ class GearScraper:
     def parse(self, gender):
 
         board_list = []
-        single_board_dict = {}
-
         url_list = self.__get_boards_url(gender, self.driver)
+
         for url in tqdm(url_list[:20], desc="Getting ratings..."):
+            single_board_dict = {}
             single_board_dict['id'] = self.__hashme(url)
             single_board_dict['ratings'] = self.__get_ratings(url, self.driver)
             single_board_dict['meta_data'] = self.__get_meta_data(url, gender, self.driver)
