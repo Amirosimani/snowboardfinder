@@ -45,7 +45,7 @@ You will also need to create an Elastic Container Registry within AWS - a place 
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ACCOUNT ID>.dkr.ecr.us-east-1.amazonaws.com
 
 # Create a repository in Amazon ECR 
-aws ecr create-repository --repository-name snowboard --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
+aws ecr create-repository --repository-name snowboard-ml --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
 
 
 #Tag the image to match  repository name, and deploy the image to Amazon ECR
@@ -134,3 +134,4 @@ bucket:
 ----
 TODO:
 [ ] multi-threaded scraping
+[ ] similarity percentiles over all boards

@@ -1,5 +1,4 @@
-#tqdm==4.61.1
-#scipy
-#pandas
+#scipy==1.6.3
+pandas==1.2.4
 boto3
 botocore
