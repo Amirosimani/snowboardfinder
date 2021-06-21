@@ -1,9 +1,9 @@
-import similarity_functions
+import similarity
 import aws_s3 as s3s
 
 
 def handler(event, context):
-    sim = similarity_functions.Similarity()
+    sim = similarity.Similarity()
     key = event['folder_path'] + event['gender'] + '.json'
 
     # get scraped file from S3
