@@ -37,3 +37,24 @@ def upload_object(object: bytes, bucket: str, key: str) -> bool:
         logging.error(e)
         return False
     return True
+
+
+def upload_csv(local_path, bucket, key) -> bool:
+    """
+
+    Args:
+        local_path:
+        bucket:
+        key:
+
+    Returns:
+
+    """
+    s3 = boto3.resource('s3')
+    try:
+        s3.meta.client.upload_file(local_path, bucket, key)
+        logging.info(f"Successfully uploaded object to '{bucket}' as '{key}'.")
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
