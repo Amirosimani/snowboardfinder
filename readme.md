@@ -7,14 +7,21 @@ folder structure
 ----
 ## Lambda Functions
 
-### Web Scraper
+* Web Scraper
+* Machine Learning
+
+#### Web Scraper
 This project containerises a web scraper that can query the good ride website and then scrape and save all the snowboard reviews and ratings.
 
-The src code for the web scraper is found in the `lambda-scra[er`; app.py contains the lambda function handler and modules scraper and aws_s3 are helper modules for scraping and persisting to S3 respectively.
+The src code for the web scraper is found in the `lambda-scraper`; app.py contains the lambda function handler and modules scraper and aws_s3 are helper modules for scraping and persisting to S3 respectively.
 
-#### Building the container
+#### Machine Learning
 
-The Dockerfile contains the instructions to build this image. You can run the command to create the image lambda/web-scraper version latest
+### Building the container
+
+The Dockerfile contains the instructions to build this image. This guide shows the steps you need to take for the webs scraper as an example. However, same steps apply to other lambda functions.
+
+You can run the command to create the image lambda/web-scraper version latest
 
 	docker build -t lambda/web-scraper:latest .
 
@@ -29,7 +36,7 @@ The -v flag mounts your local AWS credentials into the docker container allowing
 
 To confirm the container is working as it should locally, you can run a similar command to
 
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"bucket":"snowboard-finder", "folder_path":"raw/"}'
+	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"bucket":"snowboard-finder", "folder_path":"raw/", "gender":"mens"}'
 
 
 This command intends to query the website, scrape the ratings for both mens and womens boards and then persist them to a bucket called 'snowboard-finder' within a 'folder' called 'raw'.
@@ -45,19 +52,69 @@ You will also need to create an Elastic Container Registry within AWS - a place 
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ACCOUNT ID>.dkr.ecr.us-east-1.amazonaws.com
 
 # Create a repository in Amazon ECR 
-aws ecr create-repository --repository-name snowboard --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
+aws ecr create-repository --repository-name snowboard-ml --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
 
 
 #Tag the image to match  repository name, and deploy the image to Amazon ECR
-docker tag lambda/image-scraper <ACCOUNT ID>.dkr.ecr.us-east-1.amazonaws.com/snowboard-web-scraper:latest
+docker tag lambda/web-scraper <ACCOUNT ID>.dkr.ecr.us-east-1.amazonaws.com/snowboard-web-scraper:latest
 docker push <ACCOUNT ID>.dkr.ecr.us-east-1.amazonaws.com/snowboard-web-scraper:latest
 
 ```
 
+testing on AWS for both scraper and ml
 
------
+```json
+{
+  "gender": "mens",
+  "bucket": "snowboard-finder",
+  "folder_path": "raw/"
+}
 
+```
 
+sample test for S3 object change
+
+```json
+{
+  "Records": [
+    {
+      "eventVersion": "2.0",
+      "eventSource": "aws:s3",
+      "awsRegion": "us-west-2",
+      "eventTime": "1970-01-01T00:00:00.000Z",
+      "eventName": "ObjectCreated:Put",
+      "userIdentity": {
+        "principalId": "EXAMPLE"
+      },
+      "requestParameters": {
+        "sourceIPAddress": "127.0.0.1"
+      },
+      "responseElements": {
+        "x-amz-request-id": "EXAMPLE123456789",
+        "x-amz-id-2": "EXAMPLE123/5678abcdefghijklambdaisawesome/mnopqrstuvwxyzABCDEFGH"
+      },
+      "s3": {
+        "s3SchemaVersion": "1.0",
+        "configurationId": "testConfigRule",
+        "bucket": {
+          "name": "<BUCKET NAME>",
+          "ownerIdentity": {
+            "principalId": "EXAMPLE"
+          },
+          "arn": "arn:aws:s3:::<BUCKET NAME>"
+        },
+        "object": {
+          "key": "<KEY>",
+          "size": 1024,
+          "eTag": "0123456789abcdef0123456789abcdef",
+          "sequencer": "0A1B2C3D4E5F678901"
+        }
+      }
+    }
+  ]
+}
+
+```
 
 link: https://main.dewjwq19opv7d.amplifyapp.com/
 
@@ -68,4 +125,5 @@ bucket:
 
 ----
 TODO:
-[ ] calculate simialrity statistics i.e you can compare recommendations with all k-similar boards
+[ ] multi-threaded scraping
+[ ] similarity percentiles over all boards
