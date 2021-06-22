@@ -1,4 +1,0 @@
-selenium==3.141.0
-# annoy
-bs4
-scikit-learn
