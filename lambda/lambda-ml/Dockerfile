@@ -6,7 +6,7 @@ ARG DISTRO_VERSION="3.12"
 # Stage 1 - bundle base image + runtime
 # Grab a fresh copy of the image
 #FROM python:${RUNTIME_VERSION}-buster as build-image
-FROM python:${RUNTIME_VERSION}-alpine${DISTRO_VERSION} AS python-alpine
+FROM python:${RUNTIME_VERSION}-buster AS build-image
 # Install aws-lambda-cpp build dependencies
 RUN apt-get update && \
   apt-get install -y \
