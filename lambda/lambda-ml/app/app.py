@@ -1,22 +1,46 @@
+import os
+import boto3
+import urllib.parse
 import similarity
 import aws_s3 as s3s
-import boto3
+
+print('Loading function')
+
+s3 = boto3.client('s3')
 
 
 def handler(event, context):
-    sim = similarity.Similarity()
-    key = event['folder_path'] + event['gender'] + '.json'
+    # Get the object from the event and show its content type
+    try:
+        key = event['folder_path'] + event['gender'] + '.json'
+        bucket = event['bucket']
+        gender = event['gender']
+    except KeyError as e:
+        bucket = event['Records'][0]['s3']['bucket']['name']
+        key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
+        base = os.path.basename(key)
+        gender = os.path.splitext(base)[0]
+    # try:
+    #     response = s3.get_object(Bucket=bucket, Key=key)
+    #     print("CONTENT TYPE: " + response['ContentType'])
+    # except Exception as e:
+    #     print(e)
+    #     print(
+    #         'Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.'.format(
+    #             key, bucket))
+    #     raise e
 
+    sim = similarity.Similarity()
     # get scraped file from S3
-    scraped_json = s3s.download_object(event['bucket'], key)
+    scraped_json = s3s.download_object(bucket, key)
     print("1/3 snowboard reviews are loaded...")
     # calculate most similar boards
     df = sim.calculate_similarity(scraped_json)
     print("2/3 similarity scores calculated...")
-    tmp_file = f"/tmp/{event['gender']}.csv"
+    tmp_file = f"/tmp/{gender}.csv"
     df.to_csv(tmp_file, index=False)
 
-    key = 'sim/' + event['gender'] + '.csv'
-    s3s.upload_csv(tmp_file, event['bucket'], key)
+    upload_key = 'sim/' + gender + '.csv'
+    s3s.upload_csv(tmp_file, bucket, upload_key)
 
-    return f"Successfully calculated top most similar boards and saved it to {event['bucket']}/{key}"
+    return f"Successfully calculated top most similar boards and saved it to {bucket}/{upload_key}"
