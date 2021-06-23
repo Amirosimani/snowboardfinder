@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import './App.css';
 import getData from './info-json';
 
+
 class App extends Component {
 
   constructor(){
@@ -20,7 +21,9 @@ class App extends Component {
 
   render(){
     const styleInfo = {
-      paddingRight:'10px'
+      paddingRight:'10px',
+      textDecoration: 'none',
+      color: '#000000'
     }
     const elementStyle ={
       border:'solid',
@@ -44,9 +47,7 @@ class App extends Component {
       <div>
         <ul>
           <li style={{position:'relative',left:'10vh'}}>
-            <span style={styleInfo}>{data.meta_data.name}</span>
-            <span style={styleInfo}>{data.meta_data.gender}</span>
-            <span style={styleInfo}>{data.meta_data.price}</span>
+            <a style={styleInfo} href={data.meta_data.url} target="_blank"><span style={styleInfo} >{data.meta_data.name.replace('-snowboard-review','').replace('-snowboard-reveiw','')}</span></a>
           </li>
         </ul>
       </div>

@@ -122,8 +122,15 @@ link: https://main.dewjwq19opv7d.amplifyapp.com/
 
 web scraper: https://github.com/rchauhan9/image-scraper-lambda-container
 bucket: 
+---
+## Web
+
+Using react
+source: https://medium.com/crobyer/search-filter-with-react-js-88986c644ed5
+
 
 ----
 TODO:
-[ ] multi-threaded scraping
+[ ] scraper: multi-threaded scraping
+[ ] web: clean up/format names: drop -snowboard-review, remove extra -
 [ ] similarity percentiles over all boards
