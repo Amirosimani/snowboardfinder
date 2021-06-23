@@ -3,13 +3,9 @@ import json
 import base64
 import hashlib
 import logging
+import platform
 from tqdm import tqdm
 from selenium import webdriver
-
-# For local testing + line 22
-# from webdriver_manager.chrome import ChromeDriverManager
-# driver = webdriver.Chrome(ChromeDriverManager().install())
-
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(process)d --- %(name)s %(funcName)20s() : %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
@@ -19,10 +15,15 @@ class GearScraper:
     logger = logging.getLogger('GearScraper')
 
     def __init__(self):
-        # self.driver = webdriver.Chrome(ChromeDriverManager().install())
-        self._tmp_folder = '/tmp/img-scrpr-chrm/'
-        self.driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver',
-                                       options=self.__get_default_chrome_options())
+        current_platform = platform.platform()
+        if 'macOS' in current_platform:  # for local run
+            logging.info("Local-mode detected...downloading webdriver")
+            from webdriver_manager.chrome import ChromeDriverManager
+            self.driver = webdriver.Chrome(ChromeDriverManager().install())
+        else:   # for running in Lambda
+            self._tmp_folder = '/tmp/img-scrpr-chrm/'
+            self.driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver',
+                                           options=self.__get_default_chrome_options())
 
     def parse(self, gender):
 
