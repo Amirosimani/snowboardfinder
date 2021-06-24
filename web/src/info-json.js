@@ -1,4 +1,4 @@
-var jsonData = require('./data/data.json');
+var jsonData = require('./data/mens.json');
 console.log(jsonData);
 
 

@@ -40,16 +40,19 @@ class GearScraper:
     logger = logging.getLogger('GearScraper')
 
     def __init__(self):
-        current_platform = platform.platform()
-        if 'macOS' in current_platform:  # for local run
-            logging.info("Local-mode detected...downloading webdriver")
-            from webdriver_manager.chrome import ChromeDriverManager
-            self.driver = webdriver.Chrome(ChromeDriverManager().install(),
-                                           options=self.__get_default_chrome_options())
-        else:  # for running in Lambda
-            self._tmp_folder = '/tmp/img-scrpr-chrm/'
-            self.driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver',
-                                           options=self.__get_default_chrome_options())
+        logging.info("Local-mode detected...downloading webdriver")
+        print(platform.platform(), '********')
+        from webdriver_manager.chrome import ChromeDriverManager
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())
+        # current_platform = platform.platform()
+        # if 'macOS' in current_platform:  # for local run
+        #     logging.info("Local-mode detected...downloading webdriver")
+        #     from webdriver_manager.chrome import ChromeDriverManager
+        #     self.driver = webdriver.Chrome(ChromeDriverManager().install())
+        # else:  # for running in Lambda
+        #     self._tmp_folder = '/tmp/img-scrpr-chrm/'
+        #     self.driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver',
+        #                                    options=self.__get_default_chrome_options())
 
     def parse(self, gender):
 
@@ -171,7 +174,6 @@ class GearScraper:
             '--disable-setuid-sandbox',
             '--disable-speech-api',
             '--disable-sync',
-            '--enable-automation',
             '--disk-cache-size=33554432',
             '--hide-scrollbars',
             '--ignore-gpu-blacklist',
@@ -189,16 +191,13 @@ class GearScraper:
             '--single-process',
             '--headless']
 
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        chrome_options.add_experimental_option('useAutomationExtension', False)
-
+        # chrome_options.add_argument('--disable-gpu')
         for argument in lambda_options:
             chrome_options.add_argument(argument)
-        # chrome_options.add_argument('--user-data-dir={}'.format(self._tmp_folder + '/user-data'))
-        # chrome_options.add_argument('--data-path={}'.format(self._tmp_folder + '/data-path'))
-        # chrome_options.add_argument('--homedir={}'.format(self._tmp_folder))
-        # chrome_options.add_argument('--disk-cache-dir={}'.format(self._tmp_folder + '/cache-dir'))
+        chrome_options.add_argument('--user-data-dir={}'.format(self._tmp_folder + '/user-data'))
+        chrome_options.add_argument('--data-path={}'.format(self._tmp_folder + '/data-path'))
+        chrome_options.add_argument('--homedir={}'.format(self._tmp_folder))
+        chrome_options.add_argument('--disk-cache-dir={}'.format(self._tmp_folder + '/cache-dir'))
 
         return chrome_options
 
