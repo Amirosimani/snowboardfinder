@@ -116,9 +116,7 @@ sample test for S3 object change
 
 ```
 
-link: https://main.dewjwq19opv7d.amplifyapp.com/
-
-
+link: https://main.d1dbeq6kwnylr9.amplifyapp.com/
 
 web scraper: https://github.com/rchauhan9/image-scraper-lambda-container
 bucket: 

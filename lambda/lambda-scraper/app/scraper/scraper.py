@@ -6,7 +6,31 @@ import logging
 import platform
 from tqdm import tqdm
 from selenium import webdriver
-from multiprocessing.pool import ThreadPool
+
+import boto3
+from botocore.exceptions import ClientError
+
+
+def upload_object(object: bytes, bucket: str, key: str) -> bool:
+    """
+    Upload an image file to an S3 bucket
+
+    object: The file in bytes to upload to s3
+    bucket: Bucket to upload to
+    key: The key to save the object as
+
+    Returns:
+        True if file was uploaded, else False
+    """
+    s3_client = boto3.client('s3')
+    try:
+        s3_client.put_object(Body=object, Bucket=bucket, Key=key)
+        logging.info(f"Successfully uploaded object to '{bucket}' as '{key}'.")
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
+
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(process)d --- %(name)s %(funcName)20s() : %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
@@ -31,7 +55,8 @@ class GearScraper:
         board_list = []
         url_list = self.__get_boards_url(gender, self.driver)
 
-        for url in tqdm(url_list[255:], desc="Getting ratings..."):
+        for url in tqdm(url_list[:], desc="Getting ratings..."):
+            time.sleep(5)
             single_board_dict = {}
             single_board_dict['id'] = self.__hashme(url)
             single_board_dict['ratings'] = self.__get_ratings(url, self.driver)
@@ -171,3 +196,12 @@ class GearScraper:
         chrome_options.add_argument('--disk-cache-dir={}'.format(self._tmp_folder + '/cache-dir'))
 
         return chrome_options
+
+
+if __name__ == '__main__':
+    scr = GearScraper()
+    board_ratings = scr.parse('mens')
+    scr.close_connection()
+
+    key = 'raw/mens.json'
+    upload_object(board_ratings, "snowboard-finder", key)
