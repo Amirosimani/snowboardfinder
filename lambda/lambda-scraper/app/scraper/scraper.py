@@ -3,12 +3,33 @@ import json
 import base64
 import hashlib
 import logging
+import platform
 from tqdm import tqdm
 from selenium import webdriver
 
-# For local testing + line 22
-# from webdriver_manager.chrome import ChromeDriverManager
-# driver = webdriver.Chrome(ChromeDriverManager().install())
+import boto3
+from botocore.exceptions import ClientError
+
+
+def upload_object(object: bytes, bucket: str, key: str) -> bool:
+    """
+    Upload an image file to an S3 bucket
+
+    object: The file in bytes to upload to s3
+    bucket: Bucket to upload to
+    key: The key to save the object as
+
+    Returns:
+        True if file was uploaded, else False
+    """
+    s3_client = boto3.client('s3')
+    try:
+        s3_client.put_object(Body=object, Bucket=bucket, Key=key)
+        logging.info(f"Successfully uploaded object to '{bucket}' as '{key}'.")
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
 
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(process)d --- %(name)s %(funcName)20s() : %(message)s',
@@ -19,17 +40,24 @@ class GearScraper:
     logger = logging.getLogger('GearScraper')
 
     def __init__(self):
-        # self.driver = webdriver.Chrome(ChromeDriverManager().install())
-        self._tmp_folder = '/tmp/img-scrpr-chrm/'
-        self.driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver',
-                                       options=self.__get_default_chrome_options())
+        current_platform = platform.platform()
+        if 'macOS' in current_platform:  # for local run
+            logging.info("Local-mode detected...downloading webdriver")
+            from webdriver_manager.chrome import ChromeDriverManager
+            self.driver = webdriver.Chrome(ChromeDriverManager().install(),
+                                           options=self.__get_default_chrome_options())
+        else:  # for running in Lambda
+            self._tmp_folder = '/tmp/img-scrpr-chrm/'
+            self.driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver',
+                                           options=self.__get_default_chrome_options())
 
     def parse(self, gender):
 
         board_list = []
         url_list = self.__get_boards_url(gender, self.driver)
 
-        for url in tqdm(url_list[:20], desc="Getting ratings..."):
+        for url in tqdm(url_list[:], desc="Getting ratings..."):
+            time.sleep(5)
             single_board_dict = {}
             single_board_dict['id'] = self.__hashme(url)
             single_board_dict['ratings'] = self.__get_ratings(url, self.driver)
@@ -76,13 +104,21 @@ class GearScraper:
 
         # top-left table
         elems = driver.find_elements_by_xpath('//*[@id="post-"]/div[1]/div[2]/div[2]/table/tbody/*')
-        for item in [e.text.split() for e in elems]:
-            rating_dict[item[0]] = item[1]
+        # rating_dict['tl'] = [e.text for e in elems]
+        for item in [e.text.split('\n') for e in elems]:
+            try:
+                rating_dict[item[0]] = item[1]
+            except IndexError as e:  # 254
+                rating_dict[item[0]] = 'N/A'
 
         # bottom table
         elems = driver.find_elements_by_xpath('//*[@id="post-"]/div[1]/div[2]/div[3]/*/table/tbody/*')
-        for item in [e.text.split() for e in elems]:
-            rating_dict[item[0]] = item[1]
+        # rating_dict['b'] = [e.text for e in elems]
+        for item in [e.text.split('\n') for e in elems]:
+            try:
+                rating_dict[item[0]] = item[1]
+            except IndexError as e:
+                rating_dict[item[0]] = 'N/A'
         return rating_dict
 
     @staticmethod
@@ -135,6 +171,7 @@ class GearScraper:
             '--disable-setuid-sandbox',
             '--disable-speech-api',
             '--disable-sync',
+            '--enable-automation',
             '--disk-cache-size=33554432',
             '--hide-scrollbars',
             '--ignore-gpu-blacklist',
@@ -152,12 +189,28 @@ class GearScraper:
             '--single-process',
             '--headless']
 
-        # chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option('useAutomationExtension', False)
+
         for argument in lambda_options:
             chrome_options.add_argument(argument)
-        chrome_options.add_argument('--user-data-dir={}'.format(self._tmp_folder + '/user-data'))
-        chrome_options.add_argument('--data-path={}'.format(self._tmp_folder + '/data-path'))
-        chrome_options.add_argument('--homedir={}'.format(self._tmp_folder))
-        chrome_options.add_argument('--disk-cache-dir={}'.format(self._tmp_folder + '/cache-dir'))
+        # chrome_options.add_argument('--user-data-dir={}'.format(self._tmp_folder + '/user-data'))
+        # chrome_options.add_argument('--data-path={}'.format(self._tmp_folder + '/data-path'))
+        # chrome_options.add_argument('--homedir={}'.format(self._tmp_folder))
+        # chrome_options.add_argument('--disk-cache-dir={}'.format(self._tmp_folder + '/cache-dir'))
 
         return chrome_options
+
+
+def get_ratings(gender, bucket="snowboard-finder"):
+    scr = GearScraper()
+    board_ratings = scr.parse(gender)
+    scr.close_connection()
+
+    key = f'raw/{gender}.json'
+    upload_object(board_ratings, bucket, key)
+
+
+if __name__ == '__main__':
+    get_ratings('mens')
