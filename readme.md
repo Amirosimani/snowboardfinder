@@ -1,5 +1,8 @@
 # Snow Authority
 
+Access the web app [here](https://main.drjtgnyfx2lcm.amplifyapp.com/)
+
+
 # The Source Code
 
 folder structure
@@ -9,6 +12,8 @@ folder structure
 
 * Web Scraper
 * Machine Learning
+
+based on this [example](https://github.com/rchauhan9/image-scraper-lambda-container)
 
 #### Web Scraper
 This project containerises a web scraper that can query the good ride website and then scrape and save all the snowboard reviews and ratings.
@@ -116,10 +121,6 @@ sample test for S3 object change
 
 ```
 
-link: https://main.d1dbeq6kwnylr9.amplifyapp.com/
-
-web scraper: https://github.com/rchauhan9/image-scraper-lambda-container
-bucket: 
 ---
 ## Web
 
@@ -130,5 +131,6 @@ source: https://medium.com/crobyer/search-filter-with-react-js-88986c644ed5
 ----
 TODO:
 [ ] scraper: multi-threaded scraping
+[ ] scraper: move to batch (too long for lambda)
 [ ] web: clean up/format names: drop -snowboard-review, remove extra -
 [ ] similarity percentiles over all boards
