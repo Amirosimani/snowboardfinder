@@ -20,15 +20,6 @@ def handler(event, context):
         key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
         base = os.path.basename(key)
         gender = os.path.splitext(base)[0]
-    # try:
-    #     response = s3.get_object(Bucket=bucket, Key=key)
-    #     print("CONTENT TYPE: " + response['ContentType'])
-    # except Exception as e:
-    #     print(e)
-    #     print(
-    #         'Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.'.format(
-    #             key, bucket))
-    #     raise e
 
     sim = similarity.Similarity()
     # get scraped file from S3

@@ -213,4 +213,4 @@ def get_ratings(gender, bucket="snowboard-finder"):
 
 
 if __name__ == '__main__':
-    get_ratings('mens')
+    get_ratings('womens')

@@ -10,16 +10,16 @@ class Similarity:
     logger = logging.getLogger('Similarity')
 
     def __init__(self):
-        self.sel_cols = ['ratings.Riding Style',
-                         'ratings.Riding Level', 'ratings.Shape', 'ratings.Camber Profile',
-                         'ratings.Stance', 'ratings.Approx. Weight', 'ratings.Powder',
-                         'ratings.Turning', 'ratings.Carving', 'ratings.Speed', 'ratings.Uneven',
+
+        self.sel_cols = ['ratings.Riding Style', 'ratings.Riding Level', 'ratings.Shape', 'ratings.Camber Profile',
+                         'ratings.Stance', 'ratings.Approx. Weight',
+                         'ratings.Powder', 'ratings.Turning', 'ratings.Carving', 'ratings.Speed', 'ratings.Uneven',
                          'ratings.Switch', 'ratings.Jumps', 'ratings.Jibbing', 'ratings.Pipe',
-                         'ratings.On', 'ratings.Turn', 'ratings.Skidded', 'ratings.Flex',
-                         'ratings.Buttering', 'ratings.Edge']
+                         #'ratings.On', 'ratings.Turn', 'ratings.Skidded', , 'ratings.Edge'
+                         'ratings.Flex', 'ratings.Buttering']
+# TODO: scraper has a bug for 4 columns
 
         self.meta_cols = ['id',
-                          'meta_data.name',
                           'meta_data.name',
                           'meta_data.gender',
                           'meta_data.url',
