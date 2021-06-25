@@ -1,6 +1,6 @@
 # Snow Authority
 
-Access the web app [here](https://main.drjtgnyfx2lcm.amplifyapp.com/)
+Access the web app [here](https://main.d1h5te0v7knaev.amplifyapp.com/)
 
 
 # The Source Code

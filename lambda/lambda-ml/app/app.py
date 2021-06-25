@@ -34,4 +34,11 @@ def handler(event, context):
     upload_key = 'sim/' + gender + '.csv'
     s3s.upload_csv(tmp_file, bucket, upload_key)
 
+    sim_d = {}
+    for idx, row in df.iterrows():
+        sim_d[row['id']] = row['similar_boards']
+
+    dict_key = 'sim/' + gender + '.json'
+    s3s.upload_object(sim_d, bucket, )
     return f"Successfully calculated top most similar boards and saved it to {bucket}/{upload_key}"
+
