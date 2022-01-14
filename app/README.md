@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Instalation
+
+If you get a `react-scripts: command not found`, you should delete `package-lock.json` file in your project folder and then install dependencies again by `npm install`.
+
 ## Available Scripts
 
 In the project directory, you can run:
