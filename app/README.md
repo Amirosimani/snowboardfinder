@@ -2,22 +2,30 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Instalation
+## Installation
+* Install latest vestion of nodejs from [here](https://nodejs.org/en/download/). The Node Package Manager is included in the Node.js distribution. 
+Make sure that `/usr/local/bin` is in your $PATH. You can run `echo $PATH` to verify it. You should see something like this
+```
+/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
+```
 
-If you get a `react-scripts: command not found`, you should delete `package-lock.json` file in your project folder and then install dependencies again by `npm install`.
+* Install dependancies by running `npm install`.
 
-## Available Scripts
+If you get a `react-scripts: command not found`, you should delete `package-lock.json` file in your project folder and then install packages again.  If the package has a package-lock, or an npm shrinkwrap file, or a yarn lock file, the installation of dependencies will be driven by that
 
-In the project directory, you can run:
+## Starting the app
 
-### `npm start`
+To run the app in the development mode, in the project directory run:
 
-Runs the app in the development mode.\
+`npm start`
+
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
+
+--------
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.\

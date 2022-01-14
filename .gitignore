@@ -23,3 +23,6 @@ amplify-build-config.json
 amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
+
+# react app
+app/package-lock.json
