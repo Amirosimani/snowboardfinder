@@ -7,8 +7,8 @@ import platform
 from tqdm import tqdm
 from selenium import webdriver
 
-import boto3
-from botocore.exceptions import ClientError
+# import boto3
+# from botocore.exceptions import ClientError
 
 
 def upload_object(object: bytes, bucket: str, key: str) -> bool:
@@ -45,14 +45,22 @@ class GearScraper:
         from webdriver_manager.chrome import ChromeDriverManager
         self.driver = webdriver.Chrome(ChromeDriverManager().install())
         # current_platform = platform.platform()
-        # if 'macOS' in current_platform:  # for local run
-        #     logging.info("Local-mode detected...downloading webdriver")
-        #     from webdriver_manager.chrome import ChromeDriverManager
-        #     self.driver = webdriver.Chrome(ChromeDriverManager().install())
-        # else:  # for running in Lambda
-        #     self._tmp_folder = '/tmp/img-scrpr-chrm/'
-        #     self.driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver',
-        #                                    options=self.__get_default_chrome_options())
+        if 'macOS' in current_platform:  # for local run
+            logging.info("Local-mode detected...downloading webdriver")
+            # from webdriver_manager.chrome import ChromeDriverManager
+            # self.driver = webdriver.Chrome(ChromeDriverManager().install())
+            chrome_options = Options()
+            chrome_options.add_argument('--headless')
+            chrome_options.add_argument('--no-sandbox')
+            chrome_options.add_argument('--disable-dev-shm-usage')
+            self.driver = webdriver.Chrome('./chromedriver', chrome_options=chrome_options)
+            self.driver.get('http://www.google.com/')
+            self.driver.quit()
+
+        else:  # for running in Lambda
+            self._tmp_folder = '/tmp/img-scrpr-chrm/'
+            self.driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver',
+                                           options=self.__get_default_chrome_options())
 
     def parse(self, gender):
 
@@ -207,9 +215,9 @@ def get_ratings(gender, bucket="snowboard-finder"):
     board_ratings = scr.parse(gender)
     scr.close_connection()
 
-    key = f'raw/{gender}.json'
-    upload_object(board_ratings, bucket, key)
-
+    # key = f'raw/{gender}.json'
+    # upload_object(board_ratings, bucket, key)
+    print(board_ratings)
 
 if __name__ == '__main__':
     get_ratings('mens')
