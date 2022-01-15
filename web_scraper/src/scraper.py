@@ -1,3 +1,4 @@
+import os
 import time
 import json
 import base64
@@ -5,7 +6,10 @@ import hashlib
 import logging
 import platform
 from tqdm import tqdm
+from datetime import datetime
 from selenium import webdriver
+import argparse
+
 
 # import boto3
 # from botocore.exceptions import ClientError
@@ -42,20 +46,19 @@ class GearScraper:
     def __init__(self):
         logging.info("Local-mode detected...downloading webdriver")
         print(platform.platform(), '********')
-        from webdriver_manager.chrome import ChromeDriverManager
-        self.driver = webdriver.Chrome(ChromeDriverManager().install())
-        # current_platform = platform.platform()
+        # from webdriver_manager.chrome import ChromeDriverManager
+        # self.driver = webdriver.Chrome(ChromeDriverManager().install())
+        current_platform = platform.platform()
         if 'macOS' in current_platform:  # for local run
             logging.info("Local-mode detected...downloading webdriver")
-            # from webdriver_manager.chrome import ChromeDriverManager
-            # self.driver = webdriver.Chrome(ChromeDriverManager().install())
+            from webdriver_manager.chrome import ChromeDriverManager
+            from selenium.webdriver.chrome.options import Options
+
             chrome_options = Options()
             chrome_options.add_argument('--headless')
             chrome_options.add_argument('--no-sandbox')
             chrome_options.add_argument('--disable-dev-shm-usage')
-            self.driver = webdriver.Chrome('./chromedriver', chrome_options=chrome_options)
-            self.driver.get('http://www.google.com/')
-            self.driver.quit()
+            self.driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
 
         else:  # for running in Lambda
             self._tmp_folder = '/tmp/img-scrpr-chrm/'
@@ -67,7 +70,7 @@ class GearScraper:
         board_list = []
         url_list = self.__get_boards_url(gender, self.driver)
 
-        for url in tqdm(url_list[:], desc="Getting ratings..."):
+        for url in tqdm(url_list[:3], desc="Getting ratings..."):
             time.sleep(5)
             single_board_dict = {}
             single_board_dict['id'] = self.__hashme(url)
@@ -210,14 +213,36 @@ class GearScraper:
         return chrome_options
 
 
-def get_ratings(gender, bucket="snowboard-finder"):
+def get_ratings(gender, save_mode='local', **kwargs):
+    """
+    save_mode: local or cloud
+    """
+
     scr = GearScraper()
     board_ratings = scr.parse(gender)
     scr.close_connection()
+    
+    today = datetime.today().strftime('%Y%m%d')
 
-    # key = f'raw/{gender}.json'
-    # upload_object(board_ratings, bucket, key)
-    print(board_ratings)
+    if save_mode == 'local':
+        if not os.path.exists('./data'):
+            os.makedirs('./data')
+        with open(f'./data/data_{gender}_{today}.json', 'w', encoding='utf-8') as f: 
+            json.dump(board_ratings, f, ensure_ascii=True, indent=4)
+        print("Board ratings saved in local path ./data")
+        f.close()
+
+    elif save_mode == 'cloud':
+        assert 'bucket' in kwargs
+        bucket = kwargs.get('bucket')
+        key = f'raw/{gender}.json'
+        upload_object(board_ratings, bucket, key)
 
 if __name__ == '__main__':
-    get_ratings('mens')
+
+    parser = argparse.ArgumentParser(description='Mens or womens???')
+    parser.add_argument("gender", type=str, default='mens')
+    parser.add_argument("mode", type=str, default='local')
+
+    args = parser.parse_args()
+    get_ratings(args.gender, args.mode)
