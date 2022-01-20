@@ -64,7 +64,7 @@ class GearScraper:
         board_list = []
         url_list = self.__get_boards_url(gender, self.driver)
 
-        for url in tqdm(url_list[:3], desc="Getting ratings..."):
+        for url in tqdm(url_list[:2], desc="Getting ratings..."):
             time.sleep(5)
             single_board_dict = {}
             single_board_dict['id'] = self.__hashme(url)
@@ -225,11 +225,8 @@ def get_ratings(gender, mode, **kwargs):
         f_path = '../../../data/scraped'
         if not os.path.exists(f_path):
             os.makedirs(f_path)
-        with open(f'{f_path}/{gender}_{today}.json', 'w', encoding='utf-8') as f:
-            for dic in board_ratings:
-                json.dump(dic, f, ensure_ascii=True, indent=4)
-        logging.info("Board ratings saved in local path ./data")
-        f.close()
+        json.dumps(board_ratings)
+        logging.info(f"Board ratings saved in local path {f_path}")
 
     elif mode == 'cloud':
         assert 'bucket' in kwargs
