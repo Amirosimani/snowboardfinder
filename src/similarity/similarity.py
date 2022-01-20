@@ -1,9 +1,11 @@
-import logging
+import ast
 import pandas as pd
 from scipy.spatial.distance import squareform, pdist
 
+import logging
 logging.basicConfig(format='%(asctime)s %(levelname)s %(process)d --- %(name)s %(funcName)20s() : %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
+
 
 
 class Similarity:
@@ -13,7 +15,10 @@ class Similarity:
 
         self.sel_cols = ['ratings.Riding Style', 'ratings.Riding Level', 'ratings.Shape', 'ratings.Camber Profile',
                          'ratings.Stance', 'ratings.Approx. Weight',
-                         'ratings.Powder', 'ratings.Turning', 'ratings.Carving', 'ratings.Speed', 'ratings.Uneven',
+                         'ratings.Powder',
+                         # 'ratings.Turning',
+                         'ratings.Carving', 'ratings.Speed', 
+                         #'ratings.Uneven',
                          'ratings.Switch', 'ratings.Jumps', 'ratings.Jibbing', 'ratings.Pipe',
                          #'ratings.On', 'ratings.Turn', 'ratings.Skidded', , 'ratings.Edge'
                          'ratings.Flex', 'ratings.Buttering']
@@ -60,7 +65,7 @@ class Similarity:
         return df_input
 
     @staticmethod
-    def __prepare_data(file: list):
+    def __prepare_data(file: str):
         """
         load json file from S3 and convert to dataframe
         Args:
@@ -69,7 +74,15 @@ class Similarity:
         Returns:
 
         """
-        df = pd.json_normalize(file)
+        # df = pd.json_normalize(file)
+        with open(file) as file:
+            lines = file.readlines()
+            lines = [line.rstrip() for line in lines]
+
+
+        file_dict = [ast.literal_eval(l) for l in lines]
+
+        df = pd.json_normalize(file_dict)
         return df
 
     @staticmethod
@@ -87,9 +100,10 @@ class Similarity:
         return pd.DataFrame(squareform(dists))
 
 
-
 if __name__ == "__main__":
 
+    file_path = '/Users/amir/Documents/projects/snowboardfinder/data/scraped/mens_20220119.json'
+
     sim = Similarity()
-    df = sim.calculate_similarity('../../data/scraped/men_boards_20220114.json')
+    df = sim.calculate_similarity(file_path)
     print(df.head())
