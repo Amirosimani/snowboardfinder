@@ -133,10 +133,12 @@ TODO:
 
 [ ] scraper: multi-threaded scraping
 
-[ ] scraper: move to batch (too long for lambda)
+[ ] scraper: corner cases
+
+[ ] similartiy: container
+
+[ ] serverless-scraper: move to batch (too long for lambda)
 
 [ ] web: clean up/format names: drop -snowboard-review, remove extra -
-
-[ ] similarity percentiles over all boards
 
 [ ] Orchestrate components

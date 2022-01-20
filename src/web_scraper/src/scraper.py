@@ -64,7 +64,7 @@ class GearScraper:
         board_list = []
         url_list = self.__get_boards_url(gender, self.driver)
 
-        for url in tqdm(url_list[:2], desc="Getting ratings..."):
+        for url in tqdm(url_list[:], desc="Getting ratings..."):
             time.sleep(5)
             single_board_dict = {}
             single_board_dict['id'] = self.__hashme(url)
