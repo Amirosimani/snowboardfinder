@@ -130,7 +130,13 @@ source: https://medium.com/crobyer/search-filter-with-react-js-88986c644ed5
 
 ----
 TODO:
+
 [ ] scraper: multi-threaded scraping
+
 [ ] scraper: move to batch (too long for lambda)
+
 [ ] web: clean up/format names: drop -snowboard-review, remove extra -
+
 [ ] similarity percentiles over all boards
+
+[ ] Orchestrate components

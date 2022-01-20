@@ -85,3 +85,11 @@ class Similarity:
         """
         dists = pdist(df, similarity_algo)
         return pd.DataFrame(squareform(dists))
+
+
+
+if __name__ == "__main__":
+
+    sim = Similarity()
+    df = sim.calculate_similarity('../../data/scraped/men_boards_20220114.json')
+    print(df.head())

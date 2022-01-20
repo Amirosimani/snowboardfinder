@@ -1,18 +1,18 @@
+from cgitb import reset
 import os
 import time
 import json
 import base64
 import hashlib
 import logging
+import argparse
 import platform
 from tqdm import tqdm
 from datetime import datetime
 from selenium import webdriver
-import argparse
 
-
-# import boto3
-# from botocore.exceptions import ClientError
+logging.basicConfig(format='%(asctime)s %(levelname)s %(process)d --- %(name)s %(funcName)20s() : %(message)s',
+                    datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
 
 
 def upload_object(object: bytes, bucket: str, key: str) -> bool:
@@ -34,12 +34,6 @@ def upload_object(object: bytes, bucket: str, key: str) -> bool:
         logging.error(e)
         return False
     return True
-
-
-logging.basicConfig(format='%(asctime)s %(levelname)s %(process)d --- %(name)s %(funcName)20s() : %(message)s',
-                    datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
-
-
 class GearScraper:
     logger = logging.getLogger('GearScraper')
 
@@ -70,7 +64,7 @@ class GearScraper:
         board_list = []
         url_list = self.__get_boards_url(gender, self.driver)
 
-        for url in tqdm(url_list[:], desc="Getting ratings..."):
+        for url in tqdm(url_list[:3], desc="Getting ratings..."):
             time.sleep(5)
             single_board_dict = {}
             single_board_dict['id'] = self.__hashme(url)
@@ -213,7 +207,7 @@ class GearScraper:
         return chrome_options
 
 
-def get_ratings(gender, save_mode='local', **kwargs):
+def get_ratings(gender, mode, **kwargs):
     """
     save_mode: local or cloud
     """
@@ -223,16 +217,21 @@ def get_ratings(gender, save_mode='local', **kwargs):
     scr.close_connection()
     
     today = datetime.today().strftime('%Y%m%d')
+    # convert string to list of dict
+    board_ratings = json.loads(board_ratings)
 
-    if save_mode == 'local':
-        if not os.path.exists('./data'):
-            os.makedirs('./data')
-        with open(f'./data/data_{gender}_{today}.json', 'w', encoding='utf-8') as f: 
-            json.dump(board_ratings, f, ensure_ascii=True, indent=4)
-        print("Board ratings saved in local path ./data")
+    logging.info(f"{mode} mode detected")
+    if mode == 'local':
+        f_path = '../../../data/scraped'
+        if not os.path.exists(f_path):
+            os.makedirs(f_path)
+        with open(f'{f_path}/{gender}_{today}.json', 'w', encoding='utf-8') as f:
+            for dic in board_ratings:
+                json.dump(dic, f, ensure_ascii=True, indent=4)
+        logging.info("Board ratings saved in local path ./data")
         f.close()
 
-    elif save_mode == 'cloud':
+    elif mode == 'cloud':
         assert 'bucket' in kwargs
         bucket = kwargs.get('bucket')
         key = f'raw/{gender}.json'
@@ -245,4 +244,4 @@ if __name__ == '__main__':
     parser.add_argument("mode", type=str, default='local')
 
     args = parser.parse_args()
-    get_ratings(args.gender, args.mode)
+    get_ratings(args.gender, 'local')
