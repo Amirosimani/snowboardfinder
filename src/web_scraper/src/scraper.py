@@ -240,8 +240,8 @@ def get_ratings(gender, mode, **kwargs):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Mens or womens???')
-    parser.add_argument("gender", type=str, default='mens')
-    parser.add_argument("mode", type=str, default='local')
+    parser.add_argument("--gender", type=str, default='mens')
+    parser.add_argument("--mode", type=str, default='local')
 
     args = parser.parse_args()
-    get_ratings(args.gender, 'local')
+    get_ratings(args.gender, args.mode)
