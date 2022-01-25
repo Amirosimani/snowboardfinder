@@ -99,11 +99,12 @@ class Similarity:
         dists = pdist(df, similarity_algo)
         return pd.DataFrame(squareform(dists))
 
+def main(file_path):
+    sim = Similarity()
+    df = sim.calculate_similarity(file_path)
+    print(df.head())
 
 if __name__ == "__main__":
 
     file_path = '/Users/amir/Documents/projects/snowboardfinder/data/scraped/mens_20220119.json'
-
-    sim = Similarity()
-    df = sim.calculate_similarity(file_path)
-    print(df.head())
+    main(file_path)
