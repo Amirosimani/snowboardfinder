@@ -1,5 +1,6 @@
 import ast
 import pandas as pd
+from datetime import datetime
 from scipy.spatial.distance import squareform, pdist
 
 import logging
@@ -16,12 +17,13 @@ class Similarity:
         self.sel_cols = ['ratings.Riding Style', 'ratings.Riding Level', 'ratings.Shape', 'ratings.Camber Profile',
                          'ratings.Stance', 'ratings.Approx. Weight',
                          'ratings.Powder',
-                         # 'ratings.Turning',
                          'ratings.Carving', 'ratings.Speed', 
-                         #'ratings.Uneven',
                          'ratings.Switch', 'ratings.Jumps', 'ratings.Jibbing', 'ratings.Pipe',
-                         #'ratings.On', 'ratings.Turn', 'ratings.Skidded', , 'ratings.Edge'
-                         'ratings.Flex', 'ratings.Buttering']
+                         'ratings.Buttering',
+                        #  'ratings.Uneven', 'ratings.Turning', 'ratings.On', 'ratings.Turn', 'ratings.Skidded', 'ratings.Flex', 'ratings.Edge', 
+
+
+                         ]
 # TODO: scraper has a bug for 4 columns
 
         self.meta_cols = ['id',
@@ -32,7 +34,7 @@ class Similarity:
                           'meta_data.image_url'
                           ]
 
-    def calculate_similarity(self, file, topn=10, similarity_algo='jaccard'):
+    def calculate_similarity(self, file, topn=10, similarity_algo='cosine'):
         """
 
         Args:
@@ -45,6 +47,7 @@ class Similarity:
         """
         # convert json to dataframe
         df_input = self.__prepare_data(file)
+        print(df_input.shape)
 
         # encode categorical variables used to calcualte disntance
         df_train = pd.get_dummies(df_input[self.sel_cols], columns=self.sel_cols)
@@ -81,6 +84,7 @@ class Similarity:
 
 
         file_dict = [ast.literal_eval(l) for l in lines]
+        file_dict = ast.literal_eval(file_dict[0])
 
         df = pd.json_normalize(file_dict)
         return df
@@ -102,9 +106,12 @@ class Similarity:
 def main(file_path):
     sim = Similarity()
     df = sim.calculate_similarity(file_path)
-    print(df.head())
+    print(df.shape)
+    today = datetime.today().strftime('%Y%m%d')
+
+    df.to_csv(f'./sim_cosine_{today}.csv', index=False)
 
 if __name__ == "__main__":
 
-    file_path = '/Users/amir/Documents/projects/snowboardfinder/data/scraped/mens_20220119.json'
-    main(file_path)
+    file_path = '/Users/amir/Documents/projects/snowboardfinder/data/scraped/data_mens_20220114.json'
+    main(file_path)    
